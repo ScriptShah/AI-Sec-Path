@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>AI Journey · Phase 1A</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0F0F0E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AI Journey">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="icon" type="image/png" href="/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0F0F0E; --surface: #1A1A18; --surface-elevated: #232320;
+      --text: #F5F1E8; --text-muted: #888178; --text-faint: #555049;
+      --accent: #E8B547; --accent-dim: #B58A35;
+      --success: #6FA76A; --danger: #C66363;
+      --border: rgba(245, 241, 232, 0.08); --border-strong: rgba(245, 241, 232, 0.15);
+      --serif: 'Newsreader', Georgia, serif;
+      --sans: 'IBM Plex Sans', system-ui, sans-serif;
+      --mono: 'IBM Plex Mono', ui-monospace, monospace;
+      --safe-top: env(safe-area-inset-top, 0);
+      --safe-bottom: env(safe-area-inset-bottom, 0);
+    }
+    [data-theme="light"] {
+      --bg: #F5F1E8; --surface: #EDE8DC; --surface-elevated: #E5DFD0;
+      --text: #1A1A18; --text-muted: #6B6258; --text-faint: #999188;
+      --border: rgba(26, 26, 24, 0.1); --border-strong: rgba(26, 26, 24, 0.2);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--bg); color: var(--text); font-family: var(--sans);
+      font-size: 16px; line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: contain;
+    }
+    body {
+      padding: calc(var(--safe-top) + 16px) 0 calc(var(--safe-bottom) + 16px);
+      min-height: 100vh; max-width: 520px; margin: 0 auto;
+    }
+    .container { padding: 0 20px; }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px 20px;
+    }
+    .topbar-label {
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.12em; color: var(--text-muted); text-transform: uppercase;
+    }
+    .icon-btn {
+      width: 36px; height: 36px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: transparent; border: none; cursor: pointer;
+      color: var(--text-muted); border-radius: 8px;
+    }
+    .icon-btn:hover, .icon-btn:active { color: var(--text); background: var(--surface); }
+    .icon-btn svg { width: 18px; height: 18px; }
+    .hero { padding: 8px 0 24px; }
+    .hero-week {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--text-muted); letter-spacing: 0.12em;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .hero-title {
+      font-family: var(--serif); font-size: 36px; font-weight: 500;
+      line-height: 1.05; letter-spacing: -0.01em; margin-bottom: 6px;
+    }
+    .hero-subtitle {
+      font-family: var(--serif); font-style: italic; font-size: 17px;
+      color: var(--text-muted); line-height: 1.4;
+    }
+    .description {
+      font-size: 14px; color: var(--text-muted); line-height: 1.6;
+      margin: 16px 0 0; padding: 14px 16px;
+      background: var(--surface); border-radius: 10px;
+      border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    }
+    .progress {
+      margin: 24px 0 0; height: 3px; background: var(--surface);
+      border-radius: 2px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: var(--accent); border-radius: 2px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .progress-meta {
+      display: flex; justify-content: space-between;
+      font-family: var(--mono); font-size: 11px;
+      color: var(--text-muted); margin-top: 8px; letter-spacing: 0.05em;
+    }
+    .timer-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 32px 24px 28px;
+      margin: 32px 0; text-align: center;
+    }
+    .timer-state {
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.18em; color: var(--accent);
+      text-transform: uppercase; margin-bottom: 8px; font-weight: 500;
+    }
+    .timer-state.break { color: var(--success); }
+    .timer-state.idle { color: var(--text-muted); }
+    .timer-state.active { animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .timer-display {
+      font-family: var(--mono); font-size: 64px; font-weight: 400;
+      letter-spacing: -0.02em; line-height: 1; margin: 4px 0 24px;
+      color: var(--text); font-variant-numeric: tabular-nums;
+    }
+    .timer-controls { display: flex; gap: 12px; justify-content: center; }
+    .btn-primary {
+      background: var(--accent); color: #0F0F0E; border: none;
+      padding: 14px 36px; border-radius: 100px;
+      font-family: var(--sans); font-size: 15px; font-weight: 500;
+      cursor: pointer; letter-spacing: 0.02em; min-width: 140px;
+      transition: transform 0.1s, background 0.15s;
+    }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-primary:hover { background: #F0C25A; }
+    .btn-secondary {
+      background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border-strong);
+      padding: 14px 24px; border-radius: 100px;
+      font-family: var(--sans); font-size: 15px; cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .btn-secondary:hover, .btn-secondary:active { color: var(--text); border-color: var(--text); }
+    .stats {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 8px; margin: 28px 0;
+    }
+    .stat {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 8px; text-align: center;
+    }
+    .stat-value {
+      font-family: var(--mono); font-size: 20px; font-weight: 500;
+      color: var(--text); letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-label {
+      font-family: var(--mono); font-size: 9px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-faint); margin-top: 4px;
+    }
+    .section { margin: 32px 0; }
+    .section-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--serif); font-size: 22px; font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+    .section-meta {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--text-muted); letter-spacing: 0.05em;
+    }
+    .section-head.clickable { cursor: pointer; user-select: none; }
+    .section-head.clickable:hover .section-meta { color: var(--text); }
+    .task-list { display: flex; flex-direction: column; gap: 4px; }
+    .task {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 4px; border-bottom: 1px solid var(--border);
+      cursor: pointer; user-select: none;
+    }
+    .task:last-child { border-bottom: none; }
+    .task-check {
+      flex-shrink: 0; width: 20px; height: 20px;
+      border: 1.5px solid var(--border-strong); border-radius: 4px;
+      margin-top: 1px; display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .task.done .task-check { background: var(--accent); border-color: var(--accent); }
+    .task.done .task-check::after {
+      content: ""; width: 5px; height: 9px;
+      border: solid #0F0F0E; border-width: 0 1.8px 1.8px 0;
+      transform: rotate(45deg) translate(-1px, -1px);
+    }
+    .task-text { font-size: 15px; line-height: 1.4; flex: 1; }
+    .task.done .task-text {
+      color: var(--text-faint); text-decoration: line-through;
+      text-decoration-color: var(--text-faint);
+    }
+    .task-delete {
+      opacity: 0; background: transparent; border: none;
+      color: var(--text-faint); cursor: pointer; font-size: 18px;
+      padding: 0 4px; transition: opacity 0.15s, color 0.15s;
+    }
+    .task:hover .task-delete, .task:active .task-delete { opacity: 1; }
+    .task-delete:hover { color: var(--danger); }
+    .task-add { display: flex; gap: 8px; padding: 8px 0 4px; margin-top: 4px; }
+    .task-input {
+      flex: 1; background: transparent; border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 0; color: var(--text);
+      font-family: var(--sans); font-size: 15px;
+      outline: none; transition: border-color 0.15s;
+    }
+    .task-input:focus { border-color: var(--accent); }
+    .task-input::placeholder { color: var(--text-faint); }
+    .project-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--success);
+      border-radius: 10px; padding: 14px 16px;
+      font-size: 14px; line-height: 1.55; color: var(--text);
+    }
+    .project-box-label {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.15em; color: var(--success);
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+    .resources-wrapper { display: flex; flex-direction: column; gap: 20px; }
+    .resource-group { display: flex; flex-direction: column; gap: 6px; }
+    .resource-group-title {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.15em; color: var(--text-faint);
+      text-transform: uppercase; margin-bottom: 4px;
+    }
+    .resource-item {
+      display: flex; flex-direction: column; gap: 3px;
+      padding: 12px 14px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 10px;
+      text-decoration: none; color: var(--text);
+      transition: all 0.15s;
+    }
+    .resource-item:hover, .resource-item:active {
+      border-color: var(--accent); background: var(--surface-elevated);
+    }
+    .resource-item-title {
+      font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.3;
+    }
+    .resource-item-author {
+      font-size: 12px; color: var(--text-muted); font-style: italic;
+    }
+    .resource-item-note {
+      font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 2px;
+    }
+    .resource-item-url {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--text-faint); letter-spacing: 0.02em;
+      margin-top: 4px; word-break: break-all; opacity: 0.7;
+    }
+    .resource-item.essential {
+      border-left: 3px solid var(--accent);
+    }
+    .essential-badge {
+      display: inline-block; font-family: var(--mono);
+      font-size: 9px; letter-spacing: 0.15em;
+      color: var(--accent); text-transform: uppercase;
+      margin-right: 6px; font-weight: 500;
+    }
+    .notes-textarea {
+      width: 100%; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px; color: var(--text);
+      font-family: var(--serif); font-size: 16px; line-height: 1.6;
+      resize: vertical; min-height: 120px; outline: none;
+      transition: border-color 0.15s;
+    }
+    .notes-textarea:focus { border-color: var(--border-strong); }
+    .notes-textarea::placeholder { color: var(--text-faint); font-style: italic; }
+    .week-nav { display: flex; gap: 8px; margin: 32px 0 16px; }
+    .week-nav-btn {
+      flex: 1; background: var(--surface);
+      border: 1px solid var(--border); color: var(--text);
+      padding: 14px; border-radius: 12px;
+      font-family: var(--sans); font-size: 14px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .week-nav-btn:hover, .week-nav-btn:active {
+      border-color: var(--border-strong); background: var(--surface-elevated);
+    }
+    .week-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .week-nav-btn-arrow {
+      font-family: var(--mono); color: var(--text-muted); margin: 0 6px;
+    }
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      display: none; align-items: flex-end; justify-content: center; z-index: 100;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--bg); border-top: 1px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      width: 100%; max-width: 520px;
+      padding: 24px 24px calc(24px + var(--safe-bottom));
+      max-height: 85vh; overflow-y: auto;
+      animation: slideUp 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-handle {
+      width: 36px; height: 4px; background: var(--border-strong);
+      border-radius: 2px; margin: -8px auto 16px;
+    }
+    .modal-title { font-family: var(--serif); font-size: 22px; font-weight: 500; margin-bottom: 16px; }
+    .modal-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .modal-row:last-child { border-bottom: none; }
+    .modal-label { font-size: 15px; color: var(--text); }
+    .modal-input {
+      background: var(--surface); border: 1px solid var(--border-strong);
+      color: var(--text); padding: 8px 12px; border-radius: 8px;
+      font-family: var(--mono); font-size: 14px;
+      width: 80px; text-align: center; outline: none;
+    }
+    .modal-input:focus { border-color: var(--accent); }
+    .week-jump-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr);
+      gap: 6px; margin-top: 8px;
+    }
+    .week-jump-btn {
+      aspect-ratio: 1; background: var(--surface);
+      border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; font-family: var(--mono);
+      font-size: 13px; cursor: pointer; transition: all 0.15s;
+    }
+    .week-jump-btn:hover { border-color: var(--border-strong); }
+    .week-jump-btn.active { background: var(--accent); color: #0F0F0E; border-color: var(--accent); }
+    .week-jump-btn.completed { border-color: var(--accent-dim); color: var(--accent-dim); }
+    .toast {
+      position: fixed; bottom: calc(20px + var(--safe-bottom));
+      left: 50%; transform: translateX(-50%) translateY(100px);
+      background: var(--accent); color: #0F0F0E;
+      padding: 12px 20px; border-radius: 100px;
+      font-size: 14px; font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      z-index: 200; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .footer {
+      text-align: center; padding: 32px 0 16px;
+      font-family: var(--mono); font-size: 10px;
+      color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .collapsed { display: none !important; }
+    @media (max-width: 360px) {
+      .timer-display { font-size: 56px; }
+      .hero-title { font-size: 30px; }
+      .stat-value { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <span class="topbar-label" id="topbarLabel">PHASE 1A · WEEK 1/26</span>
+    <div style="display: flex; gap: 4px;">
+      <button class="icon-btn" id="themeBtn" aria-label="Toggle theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="hero">
+      <div class="hero-week" id="heroWeek">Week 1 of 26</div>
+      <h1 class="hero-title" id="heroTitle">Python Fluency</h1>
+      <p class="hero-subtitle" id="heroSubtitle">Skip basics. Focus on what AI engineering actually uses.</p>
+      <div class="description" id="weekDescription"></div>
+    </div>
+
+    <div class="progress"><div class="progress-fill" id="progressFill" style="width: 4%"></div></div>
+    <div class="progress-meta">
+      <span id="progressStart">Python</span>
+      <span id="progressEnd">4%</span>
+    </div>
+
+    <div class="timer-card">
+      <div class="timer-state idle" id="timerState">READY</div>
+      <div class="timer-display" id="timerDisplay">25:00</div>
+      <div class="timer-controls">
+        <button class="btn-primary" id="timerBtn">Start focus</button>
+        <button class="btn-secondary" id="timerResetBtn" style="display:none">Reset</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-value" id="statStreak">0</div><div class="stat-label">Streak</div></div>
+      <div class="stat"><div class="stat-value" id="statWeekHours">0.0</div><div class="stat-label">Wk hrs</div></div>
+      <div class="stat"><div class="stat-value" id="statTotalHours">0.0</div><div class="stat-label">Total</div></div>
+      <div class="stat"><div class="stat-value" id="statSessions">0</div><div class="stat-label">Sessions</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2 class="section-title">This week</h2>
+        <span class="section-meta" id="taskMeta">0 / 0</span>
+      </div>
+      <div class="task-list" id="taskList"></div>
+      <div class="task-add">
+        <input type="text" class="task-input" id="taskInput" placeholder="Add task…" maxlength="120">
+      </div>
+    </div>
+
+    <div class="section" id="projectSection" style="display:none">
+      <div class="section-head">
+        <h2 class="section-title">Project</h2>
+      </div>
+      <div class="project-box">
+        <div class="project-box-label">SHIP THIS WEEK</div>
+        <div id="projectText"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head clickable" id="resourcesToggle">
+        <h2 class="section-title">Resources</h2>
+        <span class="section-meta" id="resourcesToggleIcon">show ↓</span>
+      </div>
+      <div class="resources-wrapper collapsed" id="resourcesContainer"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2 class="section-title">Notes</h2>
+        <span class="section-meta" id="notesMeta">auto-saved</span>
+      </div>
+      <textarea class="notes-textarea" id="notesArea" placeholder="What did you learn? What got you stuck? Write something — your future self will read this."></textarea>
+    </div>
+
+    <div class="week-nav">
+      <button class="week-nav-btn" id="prevWeekBtn"><span class="week-nav-btn-arrow">←</span> Previous</button>
+      <button class="week-nav-btn" id="nextWeekBtn">Next <span class="week-nav-btn-arrow">→</span></button>
+    </div>
+
+    <div class="footer">EVERY DAY COUNTS</div>
+  </div>
+
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title">Settings</h3>
+      <div class="modal-row">
+        <span class="modal-label">Focus length</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <input type="number" class="modal-input" id="focusInput" min="5" max="120" value="25">
+          <span style="color: var(--text-muted); font-size: 13px;">min</span>
+        </div>
+      </div>
+      <div class="modal-row">
+        <span class="modal-label">Break length</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <input type="number" class="modal-input" id="breakInput" min="1" max="60" value="5">
+          <span style="color: var(--text-muted); font-size: 13px;">min</span>
+        </div>
+      </div>
+      <div class="modal-row">
+        <span class="modal-label">Sound on session end</span>
+        <input type="checkbox" id="soundInput" checked style="width: 18px; height: 18px; accent-color: var(--accent);">
+      </div>
+      <div class="modal-row"><span class="modal-label" style="color: var(--text-muted);">Jump to week</span></div>
+      <div class="week-jump-grid" id="weekJumpGrid"></div>
+      <div style="margin-top: 24px; display: flex; gap: 8px;">
+        <button class="btn-secondary" id="settingsCloseBtn" style="flex: 1;">Close</button>
+        <button class="btn-secondary" id="resetAllBtn" style="flex: 1; color: var(--danger); border-color: rgba(198, 99, 99, 0.3);">Reset all data</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Saved</div>
+
+  <script>
+    // ============================================================
+    // TOPIC RESOURCES — links for each major topic phase
+    // ============================================================
+    const TOPICS = {
+      'Python': {
+        description: 'You know JS — Python is fast for you. Don\'t waste time on basics. Type hints, async/await, Pydantic, and FastAPI are what you actually need for AI engineering.',
+        resources: {
+          'Udemy courses': [
+            { name: 'Complete Python Developer: Zero to Mastery', author: 'Andrei Neagoie', url: 'https://www.udemy.com/course/complete-python-developer-zero-to-mastery/', note: 'Faster paced, best if you already know JS — probably your pick', essential: true },
+            { name: '100 Days of Code: Python Pro Bootcamp', author: 'Angela Yu', url: 'https://www.udemy.com/course/100-days-of-code/', note: 'Project-based, very engaging' }
+          ],
+          'Free videos': [
+            { name: 'Corey Schafer\'s Python Tutorials', url: 'https://www.youtube.com/@coreyms', note: 'Gold standard YouTube channel for Python' }
+          ],
+          'Documentation': [
+            { name: 'FastAPI Tutorial', url: 'https://fastapi.tiangolo.com/tutorial/', note: 'Must-do — you\'ll use FastAPI in every AI project', essential: true },
+            { name: 'Real Python tutorials', url: 'https://realpython.com', note: 'Comprehensive free + paid content' },
+            { name: 'Pydantic docs', url: 'https://docs.pydantic.dev', note: 'Data validation, used everywhere in AI eng' }
+          ],
+          'Articles': [
+            { name: 'Python for JavaScript Developers', url: 'https://realpython.com/python-vs-javascript/', note: 'Translates concepts you already know' }
+          ],
+          'Books': [
+            { name: 'Fluent Python — Luciano Ramalho', note: 'For depth later, not now' }
+          ]
+        }
+      },
+      'LLM APIs': {
+        description: 'The bread and butter of AI engineering. Learn one provider deeply (Anthropic is a good first choice), then add the second. Streaming, tool calling, and structured outputs are non-negotiable.',
+        resources: {
+          'Udemy courses': [
+            { name: 'LLM Engineering: Master AI, Large Language Models & Agents', author: 'Ed Donner', url: 'https://www.udemy.com/course/llm-engineering-master-ai-and-large-language-models/', note: '8-week curriculum, refreshed for 2026, covers weeks 4–15 of this roadmap. Single best Udemy investment for this phase.', essential: true }
+          ],
+          'Free videos': [
+            { name: 'Andrej Karpathy: Intro to Large Language Models', url: 'https://www.youtube.com/watch?v=zjkBMFhNj_g', note: 'Best 1-hour LLM explainer ever made', essential: true },
+            { name: 'Andrej Karpathy: Deep Dive into LLMs', url: 'https://www.youtube.com/watch?v=7xTGNNLPyMI', note: '3.5 hours, deeper technical' }
+          ],
+          'Documentation': [
+            { name: 'Anthropic Documentation', url: 'https://docs.claude.com', note: 'Start here — clearest docs in the industry', essential: true },
+            { name: 'Anthropic Prompt Engineering Guide', url: 'https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview', note: 'Read every page' },
+            { name: 'OpenAI Cookbook', url: 'https://cookbook.openai.com', note: 'Concrete code recipes' },
+            { name: 'Anthropic Courses (free)', url: 'https://anthropic.skilljar.com', note: 'Official structured courses' }
+          ],
+          'Articles': [
+            { name: 'Prompting Guide (DAIR.AI)', url: 'https://www.promptingguide.ai', note: 'Comprehensive prompt engineering reference', essential: true },
+            { name: 'Lilian Weng: Prompt Engineering', url: 'https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/', note: 'Deep technical overview' }
+          ],
+          'Free short courses': [
+            { name: 'DeepLearning.AI Short Courses', url: 'https://www.deeplearning.ai/short-courses/', note: 'Especially: ChatGPT Prompt Engineering, Building Systems with the ChatGPT API' }
+          ]
+        }
+      },
+      'RAG': {
+        description: 'Retrieval-Augmented Generation. The most common production AI pattern. Get the embeddings, chunking, retrieval, and reranking right — it\'s where 80% of AI products live.',
+        resources: {
+          'Udemy courses': [
+            { name: 'Ultimate RAG Bootcamp with LangChain, LangGraph & LangSmith', url: 'https://www.udemy.com/course/', note: 'Most detailed RAG-specific course on Udemy' },
+            { name: 'AI Engineering Buildcamp: From RAG to Agents (Maven cohort)', url: 'https://maven.com/alexey-grigorev/from-rag-to-agents', note: 'Alexey Grigorev — excellent but more expensive' }
+          ],
+          'Free videos': [
+            { name: 'Pinecone YouTube', url: 'https://www.youtube.com/@pineconeio', note: 'Vector databases explained' },
+            { name: 'LlamaIndex YouTube', url: 'https://www.youtube.com/@LlamaIndex', note: 'Official applied tutorials' }
+          ],
+          'Documentation': [
+            { name: 'LlamaIndex Documentation', url: 'https://docs.llamaindex.ai', note: 'Most comprehensive RAG framework docs' },
+            { name: 'LangChain RAG Tutorial', url: 'https://python.langchain.com/docs/tutorials/rag/', note: 'Step-by-step build' },
+            { name: 'Pinecone Learning Center', url: 'https://www.pinecone.io/learn/', note: 'Free, well-written' },
+            { name: 'pgvector (Postgres)', url: 'https://github.com/pgvector/pgvector', note: 'Recommended starting vector DB' }
+          ],
+          'Articles': [
+            { name: 'Anthropic: Introducing Contextual Retrieval', url: 'https://www.anthropic.com/news/contextual-retrieval', note: 'Must-read — changes how RAG should work', essential: true },
+            { name: 'Hamel Husain\'s blog', url: 'https://hamel.dev', note: 'Practical production RAG advice' },
+            { name: 'Eugene Yan: Patterns for Building LLM Apps', url: 'https://eugeneyan.com/writing/llm-patterns/', note: 'System-level overview' }
+          ]
+        }
+      },
+      'Agents': {
+        description: 'Where AI actually does work, not just talks. Read Anthropic\'s "Building Effective Agents" before anything else. Tool design is the part most people get wrong.',
+        resources: {
+          'Udemy courses': [
+            { name: 'Production AI Agents with LangChain + LangGraph 2026', author: 'Paulo Dichone', url: 'https://www.udemy.com/course/production-ai-agents/', note: 'Production-focused, includes evals + security. Best agents course on Udemy.', essential: true }
+          ],
+          'Free videos': [
+            { name: 'LangChain Academy (free)', url: 'https://academy.langchain.com', note: 'Official LangChain courses' }
+          ],
+          'Documentation': [
+            { name: 'Anthropic: Agents and Tools', url: 'https://docs.claude.com/en/docs/agents-and-tools/overview', note: 'Tool use, computer use, MCP' },
+            { name: 'LangGraph Documentation', url: 'https://langchain-ai.github.io/langgraph/', note: 'State machines for agents' },
+            { name: 'OpenAI Platform: Agents', url: 'https://platform.openai.com/docs/guides/agents', note: 'OpenAI agent patterns' },
+            { name: 'Model Context Protocol (MCP)', url: 'https://modelcontextprotocol.io', note: 'Standard way to expose tools to agents' }
+          ],
+          'Articles': [
+            { name: 'Anthropic: Building Effective Agents', url: 'https://www.anthropic.com/research/building-effective-agents', note: 'THE essential read. Treat as textbook. Re-read.', essential: true },
+            { name: 'Lilian Weng: LLM Powered Autonomous Agents', url: 'https://lilianweng.github.io/posts/2023-06-23-agent/', note: 'Broader academic overview' }
+          ],
+          'Free short courses': [
+            { name: 'DeepLearning.AI: AI Agentic Design Patterns (Andrew Ng)', url: 'https://www.deeplearning.ai/short-courses/', note: 'Multi-agent patterns' },
+            { name: 'DeepLearning.AI: Functions, Tools and Agents with LangChain', url: 'https://www.deeplearning.ai/short-courses/' }
+          ]
+        }
+      },
+      'Evals': {
+        description: 'Most AI engineer candidates skip this — that\'s your edge. Without evals you\'re shipping vibes, not products. Hamel\'s articles are non-negotiable reading.',
+        resources: {
+          'Udemy courses': [
+            { name: 'Use Production AI Agents course from week 12-15', url: 'https://www.udemy.com/course/production-ai-agents/', note: 'It has dedicated eval modules — better than dedicated eval courses on Udemy currently' }
+          ],
+          'Free videos': [
+            { name: 'Parlance Labs Evals (Maven, paid with free preview)', url: 'https://maven.com/parlance-labs/evals', note: 'Search YouTube for free Hamel talks on evals' }
+          ],
+          'Documentation': [
+            { name: 'LangSmith docs', url: 'https://docs.smith.langchain.com', note: 'Eval + tracing platform' },
+            { name: 'Braintrust docs', url: 'https://www.braintrust.dev', note: 'Eval platform' },
+            { name: 'Weights & Biases Weave', url: 'https://wandb.ai/site/weave', note: 'Observability for LLM apps' }
+          ],
+          'Articles': [
+            { name: 'Hamel Husain: Your AI Product Needs Evals', url: 'https://hamel.dev/blog/posts/evals/', note: 'THE essential eval article. Read it 3 times.', essential: true },
+            { name: 'Hamel Husain: Field Guide to Rapidly Improving AI Products', url: 'https://hamel.dev/blog/posts/field-guide/', note: 'Companion piece', essential: true }
+          ],
+          'Books': [
+            { name: 'AI Engineering — Chip Huyen', note: 'Read alongside this phase. Canonical book for production AI engineering.', essential: true }
+          ]
+        }
+      },
+      'Build': {
+        description: 'You have the skills. Now ship two polished projects. Use your design background — most AI eng portfolios look terrible. Yours won\'t.',
+        resources: {
+          'Project ideas': [
+            { name: 'AI Security Advisor (Project 1)', note: 'Web app where users paste code → RAG over OWASP LLM Top 10 + secure coding guides surfaces risks. Differentiated, positions you for Phase 2/3.', essential: true },
+            { name: 'Design tool with AI (Project 2)', note: 'Moodboard generator, brand exploration tool, image annotator — uses your existing strength' },
+            { name: 'Multi-agent research system (Project 2)', note: 'Something that does real multi-step work' }
+          ],
+          'Deployment': [
+            { name: 'Vercel', url: 'https://vercel.com', note: 'Best for frontend + Next.js + Python API routes' },
+            { name: 'Render', url: 'https://render.com', note: 'Best for FastAPI + Postgres (free tier available)' },
+            { name: 'Railway', url: 'https://railway.app', note: 'Alternative — flat-rate pricing' }
+          ],
+          'Portfolio inspiration': [
+            { name: 'Polished AI engineer portfolios', url: 'https://github.com/topics/ai-portfolio', note: 'Study what good looks like' }
+          ]
+        }
+      },
+      'Apply': {
+        description: 'Time to land the role. Target Berlin/Munich first, remote-EU second, Frankfurt last. Don\'t over-negotiate the first offer — you\'re buying experience.',
+        resources: {
+          'Job boards (Germany/EU)': [
+            { name: 'LinkedIn Jobs', url: 'https://www.linkedin.com/jobs/', note: 'Set alerts for "AI Engineer" + "GenAI Engineer" in Berlin/Munich/Remote', essential: true },
+            { name: 'AI Jobs', url: 'https://aijobs.net', note: 'AI-specific aggregator' },
+            { name: 'Wellfound (formerly AngelList)', url: 'https://wellfound.com', note: 'Startup jobs, transparent salaries' },
+            { name: 'Y Combinator Work at a Startup', url: 'https://www.workatastartup.com', note: 'Top YC companies hiring' },
+            { name: 'Honeypot', url: 'https://www.honeypot.io', note: 'German tech market — companies apply to you' },
+            { name: 'Berlin Startup Jobs', url: 'https://berlinstartupjobs.com', note: 'Berlin-focused' },
+            { name: 'Kununu', url: 'https://www.kununu.com', note: 'German company reviews — check before applying' }
+          ],
+          'Interview prep': [
+            { name: 'AI Engineer interview prep', url: 'https://github.com/khangich/machine-learning-interview', note: 'Common questions for AI roles' },
+            { name: 'Pramp', url: 'https://www.pramp.com', note: 'Free mock interviews' }
+          ],
+          'Networking': [
+            { name: 'AI/ML Berlin Meetup', url: 'https://www.meetup.com/topics/artificial-intelligence/de/berlin/', note: 'In-person networking' },
+            { name: 'Twitter/X', url: 'https://twitter.com', note: 'Follow @swyx, @HamelHusain, @karpathy, @simonw, post your projects' }
+          ]
+        }
+      }
+    };
+
+    // ============================================================
+    // ROADMAP — 26 weeks of Phase 1A
+    // ============================================================
+    const ROADMAP = [
+      { week: 1, title: 'Python Fluency', subtitle: 'Skip basics. Focus on what AI engineering actually uses.', topic: 'Python',
+        description: 'Week 1 of 3 on Python. Get your environment set up and start absorbing the syntax differences from JS. Don\'t do a 100-hour beginner course — your JS background means most concepts transfer fast.',
+        tasks: ['Install Python 3.12 + set up uv or venv', 'Read FastAPI tutorial intro (first 3 sections)', 'Watch Corey Schafer: type hints + dataclasses', 'Compare Python vs JS syntax (Real Python article)', 'Log 10+ hours coding Python this week'] },
+      { week: 2, title: 'Async & Pydantic', subtitle: 'The patterns AI engineers use every day.', topic: 'Python',
+        description: 'Async and Pydantic are everywhere in AI code. Async because LLM calls are I/O-bound. Pydantic because you need validated, typed data flowing through your system.',
+        tasks: ['Master async/await with asyncio', 'Build 3+ examples with Pydantic models', 'Read FastAPI dependency injection guide', 'Practice context managers + generators'] },
+      { week: 3, title: 'Ship FastAPI Service', subtitle: 'Build and deploy your first Python API.', topic: 'Python',
+        description: 'End-of-phase ship week. Build something small but real, deploy it publicly, and put it on GitHub. This is the template for every project to come.',
+        tasks: ['Build FastAPI service with one LLM endpoint', 'Deploy on Render or Railway', 'Push to GitHub with proper README', 'Verify live URL works publicly'],
+        project: 'Build a tiny FastAPI service: POST /generate accepts a prompt, calls Claude or GPT, returns the response. Deploy on Render. Public GitHub repo. This is your first production AI endpoint.' },
+
+      { week: 4, title: 'LLM APIs · Foundations', subtitle: 'Anthropic, OpenAI — get fluent in both.', topic: 'LLM APIs',
+        description: 'Week 1 of 4 on LLM APIs. Focus on Anthropic first (cleanest docs), add OpenAI second. Karpathy\'s "Intro to LLMs" is required watching — schedule it for this week.',
+        tasks: ['Read Anthropic API docs end-to-end', 'Watch Karpathy: Intro to LLMs (1hr)', 'Build 3 prompts: zero-shot, few-shot, chain-of-thought', 'Read DAIR.AI Prompting Guide (sections 1-3)'] },
+      { week: 5, title: 'Streaming & Tool Calling', subtitle: 'Where AI features start feeling real.', topic: 'LLM APIs',
+        description: 'Streaming is what makes AI apps feel responsive. Tool calling is what makes them useful. Both are required skills for any AI engineering role.',
+        tasks: ['Implement streaming responses in FastAPI', 'Build tool calling with 3+ tools', 'Add error handling + retries with exponential backoff', 'Read OpenAI Cookbook examples'] },
+      { week: 6, title: 'Structured Outputs', subtitle: 'Make LLMs return reliable data.', topic: 'LLM APIs',
+        description: 'Structured outputs turn LLMs from chatbots into data pipelines. Pydantic schemas + JSON mode = the foundation of every production AI system.',
+        tasks: ['Use JSON mode + Pydantic schemas together', 'Build extraction pipeline (text → structured data)', 'Test with 10+ varied inputs', 'Document failure modes you find'] },
+      { week: 7, title: 'Ship Multi-Modal Assistant', subtitle: 'First real portfolio piece.', topic: 'LLM APIs',
+        description: 'Ship week. Combine streaming + tool calling + structured outputs into one polished app. Multi-modal (text + image input) shows you understand modern model capabilities.',
+        tasks: ['Build multi-modal AI assistant (text + image)', 'Deploy publicly with custom domain if possible', 'Write README with architecture diagram', 'Record 90-second demo video'],
+        project: 'Multi-modal AI assistant: accepts text + image, uses tool calling to fetch external data (weather, search, etc.), returns structured output. Deploy publicly. This is portfolio piece #1.' },
+
+      { week: 8, title: 'RAG · Embeddings', subtitle: 'The math that makes search work.', topic: 'RAG',
+        description: 'Week 1 of 4 on RAG. Embeddings are how LLMs "search" — vectors in high-dimensional space. Understand them deeply now, the rest of RAG builds on this.',
+        tasks: ['Read Pinecone Learning Center: vector basics', 'Generate embeddings for 100+ documents', 'Set up pgvector locally', 'Implement cosine similarity from scratch'] },
+      { week: 9, title: 'Chunking & Retrieval', subtitle: 'Where most RAG systems fail.', topic: 'RAG',
+        description: 'Chunking strategy is where 80% of RAG quality lives. Most tutorials get this wrong. Read Anthropic\'s Contextual Retrieval guide carefully — it changes the game.',
+        tasks: ['Test 3 chunking strategies (fixed, recursive, semantic)', 'Read Anthropic Contextual Retrieval guide', 'Implement hybrid search (dense + BM25)', 'Build a retrieval evaluation harness'] },
+      { week: 10, title: 'Reranking & Quality', subtitle: 'Push retrieval accuracy higher.', topic: 'RAG',
+        description: 'Reranking is the last 20% of RAG quality. Read Hamel and Eugene Yan — they\'ll teach you production patterns most courses skip.',
+        tasks: ['Add a reranker (Cohere or local model)', 'Compare retrieval metrics before/after reranking', 'Read Hamel Husain on RAG', 'Read Eugene Yan: Patterns for LLM apps'] },
+      { week: 11, title: 'Ship RAG Project', subtitle: 'Real corpus, polished UI, deployed.', topic: 'RAG',
+        description: 'Ship week. Real RAG over a real corpus. Use your design skill on the UI — most RAG demos look terrible. Yours won\'t.',
+        tasks: ['Pick corpus (Expensify code, OWASP docs, technical books)', 'Build FastAPI backend + React frontend', 'Use design skills — make it beautiful', 'Deploy + write detailed README'],
+        project: 'Production-quality RAG over your chosen corpus. FastAPI + React (or Next.js). Streaming responses, source citations, search filters. This is portfolio piece #2.' },
+
+      { week: 12, title: 'Agents · Foundations', subtitle: 'Read this: Anthropic Building Effective Agents.', topic: 'Agents',
+        description: 'Week 1 of 4 on agents. Before opening LangChain, read Anthropic\'s "Building Effective Agents" twice. Build your first agent loop without any framework — you must understand the pattern.',
+        tasks: ['Read Building Effective Agents (twice)', 'Read Lilian Weng: LLM Powered Autonomous Agents', 'Build single-agent loop from scratch (no frameworks)', 'Document the pattern in your own words'] },
+      { week: 13, title: 'Tool Design', subtitle: 'The right tools make or break the agent.', topic: 'Agents',
+        description: 'Tools are the agent\'s hands. Poor tool design = useless agent. Schemas, descriptions, error handling — get the details right.',
+        tasks: ['Design 5+ tools with proper schemas', 'Add error handling + retry logic', 'Implement parallel tool calls', 'Deliberately test failure modes'] },
+      { week: 14, title: 'Multi-Agent + MCP', subtitle: 'Step up to real systems.', topic: 'Agents',
+        description: 'Multi-agent patterns and MCP (Model Context Protocol) are the production patterns. Try LangGraph for stateful workflows.',
+        tasks: ['Read MCP (Model Context Protocol) docs', 'Build orchestrator + worker pattern', 'Try LangGraph for state management', 'Implement human-in-the-loop checkpoints'] },
+      { week: 15, title: 'Ship Research Agent', subtitle: 'Multi-step, autonomous, public.', topic: 'Agents',
+        description: 'Ship week. Build an autonomous research agent — give it a topic, it searches, reads, synthesizes, writes a report. Include prompt injection defense (you\'ll thank yourself in Phase 2).',
+        tasks: ['Build autonomous research agent', 'Add prompt injection defense', 'Deploy publicly', 'Document architecture decisions in README'],
+        project: 'Autonomous research agent: topic in → multi-step web search + content extraction → synthesized report out. Include prompt injection defenses. This positions you for the security pivot.' },
+
+      { week: 16, title: 'Evals · The Differentiator', subtitle: 'Most candidates skip this. You won\'t.', topic: 'Evals',
+        description: 'Week 1 of 3 on evals. Read Hamel\'s "Your AI Product Needs Evals" before doing anything else. This week is what separates "I built an AI demo" from "I built an AI product."',
+        tasks: ['Read Hamel: Your AI Product Needs Evals', 'Build golden dataset (50+ examples)', 'Implement LLM-as-judge', 'Set up regression test suite'] },
+      { week: 17, title: 'Observability', subtitle: 'Trace, log, monitor.', topic: 'Evals',
+        description: 'Observability is the second half of evals. Pick LangSmith or Braintrust (don\'t shop both). Read Hamel\'s field guide.',
+        tasks: ['Set up LangSmith or Braintrust', 'Add tracing to your RAG project', 'Track latency + cost per request', 'Read Hamel: Field Guide to AI Products'] },
+      { week: 18, title: 'Eval Week 11 Project', subtitle: 'This README is what gets you hired.', topic: 'Evals',
+        description: 'Apply everything from weeks 16-17 to your RAG project. The eval methodology in your README is what differentiates you in interviews.',
+        tasks: ['Add comprehensive evals to RAG project', 'Document methodology in README', 'Show before/after improvement metrics', 'Continue reading AI Engineering by Chip Huyen'] },
+
+      { week: 19, title: 'Project 1 · Plan', subtitle: 'AI Security Advisor — your differentiator.', topic: 'Build',
+        description: 'First of 4 weeks on Project 1. Plan carefully — scope, schema, architecture. A weak plan now costs 2 weeks later.',
+        tasks: ['Define scope: paste code → security risks output', 'Design schema + architecture', 'Set up project repo with CI', 'Build core RAG over OWASP LLM Top 10'],
+        project: 'AI Security Advisor: users paste code, system uses RAG over OWASP LLM Top 10 + secure coding guides to surface security risks. Different from every other portfolio project hiring managers see.' },
+      { week: 20, title: 'Project 1 · Build', subtitle: 'Make it work end-to-end.', topic: 'Build',
+        description: 'Get the core working. Don\'t polish yet. End-to-end > beautiful.',
+        tasks: ['Implement security analysis pipeline', 'Add eval harness', 'Build initial UI', 'Test with real vulnerable code samples'] },
+      { week: 21, title: 'Project 1 · Polish', subtitle: 'Use your design skill here.', topic: 'Build',
+        description: 'This is where your design background pays off. Typography, spacing, motion. Most AI portfolios look like CS student projects — make yours look professional.',
+        tasks: ['Refine UI — typography, spacing, motion', 'Add demo content + onboarding flow', 'Optimize performance', 'Write technical README with diagrams'] },
+      { week: 22, title: 'Project 1 · Ship', subtitle: 'Live, public, demo-ready.', topic: 'Build',
+        description: 'Ship Project 1. Public URL, demo video, posted to dev communities. This goes on your CV.',
+        tasks: ['Deploy to production', 'Record polished demo video', 'Post on Twitter/X and LinkedIn', 'Submit to dev.to, Hacker News, relevant subreddits'] },
+
+      { week: 23, title: 'Project 2 · Build', subtitle: 'Use your existing strength.', topic: 'Build',
+        description: 'Pick the project that plays to your strengths. Design tool, multi-agent, or internal tool clone. Define scope tightly — 3 weeks total.',
+        tasks: ['Pick: design tool / multi-agent / internal tool', 'Define scope tightly (don\'t over-scope)', 'Build core functionality', 'Test with 5+ real users'],
+        project: 'Project 2 options: (a) Design tool with AI (moodboard, image annotator) — uses your design background. (b) Multi-agent research system. (c) AI-powered internal tool you wish existed.' },
+      { week: 24, title: 'Project 2 · Polish & Ship', subtitle: 'Same bar as Project 1.', topic: 'Build',
+        description: 'Polish + ship Project 2. Same quality bar. Two great projects beat ten okay ones.',
+        tasks: ['UI polish + motion', 'Add evals', 'Write detailed README', 'Deploy + record demo video'] },
+
+      { week: 25, title: 'Portfolio · Final Polish', subtitle: 'This is what hiring managers see.', topic: 'Apply',
+        description: 'Final polish week before applications. GitHub profile, personal site, LinkedIn — make sure they all tell one coherent story: "I\'m an AI engineer."',
+        tasks: ['Update GitHub profile + pin both projects', 'Build/update personal site showcasing projects', 'Update LinkedIn — title says AI Engineer', 'Prepare 2-min self-intro for interviews'] },
+      { week: 26, title: 'Apply', subtitle: 'You\'re ready. Send 30 applications.', topic: 'Apply',
+        description: 'Application week. Volume matters early — aim for 30+ applications. Don\'t over-craft each one; cast the net wide.',
+        tasks: ['Apply to 30+ AI engineer roles', 'Reach out to 10 people on LinkedIn', 'Practice 5 mock interviews', 'Schedule first real interviews'] }
+    ];
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    const STORAGE_KEY = 'ai_journey_v1';
+    const TOTAL_WEEKS = 26;
+    const defaultState = () => ({
+      currentWeek: 1,
+      startDate: new Date().toISOString().slice(0, 10),
+      lastStudyDate: null,
+      streak: 0,
+      totalSessions: 0,
+      totalSeconds: 0,
+      weekData: {},
+      resourcesOpen: false,
+      settings: { focusMin: 25, breakMin: 5, sound: true, theme: 'dark' }
+    });
+
+    let state = loadState();
+    let timerInterval = null;
+    let timerSeconds = state.settings.focusMin * 60;
+    let timerMode = 'idle';
+    let timerPausedFrom = null;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaultState();
+        const parsed = JSON.parse(raw);
+        return { ...defaultState(), ...parsed, settings: { ...defaultState().settings, ...(parsed.settings || {}) } };
+      } catch (e) { return defaultState(); }
+    }
+    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function getWeekData(week) {
+      if (!state.weekData[week]) {
+        const roadmap = ROADMAP.find(r => r.week === week);
+        state.weekData[week] = {
+          tasks: (roadmap ? roadmap.tasks : []).map(t => ({ text: t, done: false })),
+          notes: '', seconds: 0, sessions: 0
+        };
+      }
+      return state.weekData[week];
+    }
+
+    // ============================================================
+    // RENDER
+    // ============================================================
+    function fmtTime(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = (sec % 60).toString().padStart(2, '0');
+      return m + ':' + s;
+    }
+    function fmtHours(sec) { return (sec / 3600).toFixed(1); }
+
+    function renderResources(topic) {
+      const container = document.getElementById('resourcesContainer');
+      container.innerHTML = '';
+      const t = TOPICS[topic];
+      if (!t) return;
+
+      Object.entries(t.resources).forEach(([groupName, items]) => {
+        const group = document.createElement('div');
+        group.className = 'resource-group';
+        const title = document.createElement('div');
+        title.className = 'resource-group-title';
+        title.textContent = groupName;
+        group.appendChild(title);
+
+        items.forEach(item => {
+          const el = item.url ? document.createElement('a') : document.createElement('div');
+          el.className = 'resource-item' + (item.essential ? ' essential' : '');
+          if (item.url) { el.href = item.url; el.target = '_blank'; el.rel = 'noopener'; }
+
+          const titleEl = document.createElement('div');
+          titleEl.className = 'resource-item-title';
+          if (item.essential) {
+            const badge = document.createElement('span');
+            badge.className = 'essential-badge';
+            badge.textContent = '★ START HERE';
+            titleEl.appendChild(badge);
+          }
+          titleEl.appendChild(document.createTextNode(item.name));
+          el.appendChild(titleEl);
+
+          if (item.author) {
+            const author = document.createElement('div');
+            author.className = 'resource-item-author';
+            author.textContent = 'by ' + item.author;
+            el.appendChild(author);
+          }
+          if (item.note) {
+            const note = document.createElement('div');
+            note.className = 'resource-item-note';
+            note.textContent = item.note;
+            el.appendChild(note);
+          }
+          if (item.url) {
+            const url = document.createElement('div');
+            url.className = 'resource-item-url';
+            url.textContent = item.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+            el.appendChild(url);
+          }
+          group.appendChild(el);
+        });
+        container.appendChild(group);
+      });
+    }
+
+    function render() {
+      const w = state.currentWeek;
+      const roadmap = ROADMAP.find(r => r.week === w) || ROADMAP[0];
+      const wd = getWeekData(w);
+      const topic = TOPICS[roadmap.topic];
+
+      document.getElementById('topbarLabel').textContent = 'PHASE 1A · WEEK ' + w + '/' + TOTAL_WEEKS;
+      document.getElementById('heroWeek').textContent = 'Week ' + w + ' of ' + TOTAL_WEEKS + ' · ' + roadmap.topic;
+      document.getElementById('heroTitle').textContent = roadmap.title;
+      document.getElementById('heroSubtitle').textContent = roadmap.subtitle;
+      document.getElementById('weekDescription').textContent = roadmap.description || '';
+
+      const pct = (w / TOTAL_WEEKS) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressStart').textContent = roadmap.topic;
+      document.getElementById('progressEnd').textContent = Math.round(pct) + '%';
+
+      document.getElementById('statStreak').textContent = state.streak;
+      document.getElementById('statWeekHours').textContent = fmtHours(wd.seconds);
+      document.getElementById('statTotalHours').textContent = fmtHours(state.totalSeconds);
+      document.getElementById('statSessions').textContent = state.totalSessions;
+
+      const taskList = document.getElementById('taskList');
+      taskList.innerHTML = '';
+      const doneCount = wd.tasks.filter(t => t.done).length;
+      document.getElementById('taskMeta').textContent = doneCount + ' / ' + wd.tasks.length;
+      wd.tasks.forEach((task, idx) => {
+        const el = document.createElement('div');
+        el.className = 'task' + (task.done ? ' done' : '');
+        el.innerHTML = '<div class="task-check"></div><div class="task-text"></div><button class="task-delete" aria-label="Delete">×</button>';
+        el.querySelector('.task-text').textContent = task.text;
+        el.addEventListener('click', (e) => {
+          if (e.target.classList.contains('task-delete')) return;
+          task.done = !task.done;
+          saveState(); render();
+        });
+        el.querySelector('.task-delete').addEventListener('click', (e) => {
+          e.stopPropagation();
+          wd.tasks.splice(idx, 1);
+          saveState(); render();
+        });
+        taskList.appendChild(el);
+      });
+
+      // Project section
+      const projectSec = document.getElementById('projectSection');
+      if (roadmap.project) {
+        projectSec.style.display = 'block';
+        document.getElementById('projectText').textContent = roadmap.project;
+      } else {
+        projectSec.style.display = 'none';
+      }
+
+      // Resources
+      renderResources(roadmap.topic);
+      const resWrap = document.getElementById('resourcesContainer');
+      const resIcon = document.getElementById('resourcesToggleIcon');
+      if (state.resourcesOpen) {
+        resWrap.classList.remove('collapsed');
+        resIcon.textContent = 'hide ↑';
+      } else {
+        resWrap.classList.add('collapsed');
+        resIcon.textContent = 'show ↓';
+      }
+
+      document.getElementById('notesArea').value = wd.notes;
+      document.getElementById('prevWeekBtn').disabled = w <= 1;
+      document.getElementById('nextWeekBtn').disabled = w >= TOTAL_WEEKS;
+
+      document.documentElement.setAttribute('data-theme', state.settings.theme);
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', state.settings.theme === 'light' ? '#F5F1E8' : '#0F0F0E');
+
+      if (timerMode === 'idle') {
+        timerSeconds = state.settings.focusMin * 60;
+        document.getElementById('timerDisplay').textContent = fmtTime(timerSeconds);
+      }
+
+      document.getElementById('focusInput').value = state.settings.focusMin;
+      document.getElementById('breakInput').value = state.settings.breakMin;
+      document.getElementById('soundInput').checked = state.settings.sound;
+    }
+
+    // ============================================================
+    // TIMER
+    // ============================================================
+    function setTimerState(label, cls) {
+      const el = document.getElementById('timerState');
+      el.textContent = label;
+      el.className = 'timer-state ' + cls;
+    }
+    function updateTimerDisplay() {
+      document.getElementById('timerDisplay').textContent = fmtTime(timerSeconds);
+    }
+    function tick() {
+      if (timerSeconds > 0) {
+        timerSeconds--;
+        updateTimerDisplay();
+        if (timerMode === 'focus') {
+          const wd = getWeekData(state.currentWeek);
+          wd.seconds++;
+          state.totalSeconds++;
+          if (timerSeconds % 10 === 0) saveState();
+        }
+      } else {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        if (timerMode === 'focus') onFocusComplete();
+        else if (timerMode === 'break') onBreakComplete();
+      }
+    }
+    function startTimer() {
+      if (timerMode === 'idle') {
+        timerMode = 'focus';
+        timerSeconds = state.settings.focusMin * 60;
+        setTimerState('FOCUSING', 'active');
+      } else if (timerMode === 'paused') {
+        timerMode = timerPausedFrom || 'focus';
+        setTimerState(timerMode === 'focus' ? 'FOCUSING' : 'BREAK', timerMode === 'break' ? 'break active' : 'active');
+      }
+      document.getElementById('timerBtn').textContent = 'Pause';
+      document.getElementById('timerResetBtn').style.display = 'inline-block';
+      timerInterval = setInterval(tick, 1000);
+    }
+    function pauseTimer() {
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      timerPausedFrom = timerMode;
+      timerMode = 'paused';
+      setTimerState('PAUSED', 'idle');
+      document.getElementById('timerBtn').textContent = 'Resume';
+    }
+    function resetTimer() {
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      timerMode = 'idle';
+      timerSeconds = state.settings.focusMin * 60;
+      updateTimerDisplay();
+      setTimerState('READY', 'idle');
+      document.getElementById('timerBtn').textContent = 'Start focus';
+      document.getElementById('timerResetBtn').style.display = 'none';
+    }
+    function onFocusComplete() {
+      const wd = getWeekData(state.currentWeek);
+      wd.sessions++;
+      state.totalSessions++;
+      const today = new Date().toISOString().slice(0, 10);
+      if (state.lastStudyDate !== today) {
+        const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        if (state.lastStudyDate === yesterday) state.streak++;
+        else state.streak = 1;
+        state.lastStudyDate = today;
+      }
+      saveState();
+      playChime();
+      showToast('Focus complete · +' + state.settings.focusMin + 'm');
+      timerMode = 'break';
+      timerSeconds = state.settings.breakMin * 60;
+      setTimerState('BREAK', 'break active');
+      document.getElementById('timerBtn').textContent = 'Skip break';
+      timerInterval = setInterval(tick, 1000);
+      render();
+    }
+    function onBreakComplete() {
+      playChime();
+      showToast('Break done — back to it');
+      resetTimer();
+    }
+    document.getElementById('timerBtn').addEventListener('click', () => {
+      if (timerMode === 'idle' || timerMode === 'paused') startTimer();
+      else if (timerMode === 'focus') pauseTimer();
+      else if (timerMode === 'break') { clearInterval(timerInterval); resetTimer(); }
+    });
+    document.getElementById('timerResetBtn').addEventListener('click', resetTimer);
+
+    // Chime
+    let audioCtx = null;
+    function playChime() {
+      if (!state.settings.sound) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioCtx.currentTime;
+        [880, 1320].forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.frequency.value = freq;
+          osc.type = 'sine';
+          gain.gain.setValueAtTime(0, now + i * 0.15);
+          gain.gain.linearRampToValueAtTime(0.15, now + i * 0.15 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 0.6);
+          osc.connect(gain).connect(audioCtx.destination);
+          osc.start(now + i * 0.15);
+          osc.stop(now + i * 0.15 + 0.6);
+        });
+        if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
+      } catch (e) {}
+    }
+
+    // Tasks
+    document.getElementById('taskInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const text = e.target.value.trim();
+        if (text) {
+          getWeekData(state.currentWeek).tasks.push({ text, done: false });
+          e.target.value = '';
+          saveState(); render();
+        }
+      }
+    });
+
+    // Notes
+    let notesTimer = null;
+    document.getElementById('notesArea').addEventListener('input', (e) => {
+      getWeekData(state.currentWeek).notes = e.target.value;
+      document.getElementById('notesMeta').textContent = 'saving…';
+      clearTimeout(notesTimer);
+      notesTimer = setTimeout(() => {
+        saveState();
+        document.getElementById('notesMeta').textContent = 'saved';
+      }, 600);
+    });
+
+    // Resources toggle
+    document.getElementById('resourcesToggle').addEventListener('click', () => {
+      state.resourcesOpen = !state.resourcesOpen;
+      saveState();
+      render();
+    });
+
+    // Week nav
+    document.getElementById('prevWeekBtn').addEventListener('click', () => {
+      if (state.currentWeek > 1) { state.currentWeek--; saveState(); render(); resetTimer(); }
+    });
+    document.getElementById('nextWeekBtn').addEventListener('click', () => {
+      if (state.currentWeek < TOTAL_WEEKS) { state.currentWeek++; saveState(); render(); resetTimer(); }
+    });
+
+    // Theme
+    document.getElementById('themeBtn').addEventListener('click', () => {
+      state.settings.theme = state.settings.theme === 'dark' ? 'light' : 'dark';
+      saveState(); render();
+    });
+
+    // Settings modal
+    const modal = document.getElementById('settingsModal');
+    function openSettings() { buildWeekJump(); modal.classList.add('open'); }
+    function closeSettings() { modal.classList.remove('open'); }
+    document.getElementById('settingsBtn').addEventListener('click', openSettings);
+    document.getElementById('settingsCloseBtn').addEventListener('click', closeSettings);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeSettings(); });
+
+    document.getElementById('focusInput').addEventListener('change', (e) => {
+      state.settings.focusMin = Math.max(5, Math.min(120, parseInt(e.target.value) || 25));
+      e.target.value = state.settings.focusMin;
+      saveState();
+      if (timerMode === 'idle') resetTimer();
+    });
+    document.getElementById('breakInput').addEventListener('change', (e) => {
+      state.settings.breakMin = Math.max(1, Math.min(60, parseInt(e.target.value) || 5));
+      e.target.value = state.settings.breakMin;
+      saveState();
+    });
+    document.getElementById('soundInput').addEventListener('change', (e) => {
+      state.settings.sound = e.target.checked;
+      saveState();
+    });
+
+    function buildWeekJump() {
+      const grid = document.getElementById('weekJumpGrid');
+      grid.innerHTML = '';
+      for (let w = 1; w <= TOTAL_WEEKS; w++) {
+        const btn = document.createElement('button');
+        btn.className = 'week-jump-btn' + (w === state.currentWeek ? ' active' : '');
+        const wd = state.weekData[w];
+        if (wd && wd.tasks && wd.tasks.length && wd.tasks.every(t => t.done)) {
+          btn.classList.add('completed');
+        }
+        btn.textContent = w;
+        btn.addEventListener('click', () => {
+          state.currentWeek = w;
+          saveState(); render(); resetTimer(); closeSettings();
+        });
+        grid.appendChild(btn);
+      }
+    }
+
+    document.getElementById('resetAllBtn').addEventListener('click', () => {
+      if (confirm('Reset all data? This cannot be undone.')) {
+        localStorage.removeItem(STORAGE_KEY);
+        state = defaultState();
+        resetTimer();
+        render();
+        closeSettings();
+        showToast('All data reset');
+      }
+    });
+
+    // Toast
+    let toastTimer = null;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    // Service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+
+    // Init
+    render();
+    resetTimer();
+
+    window.addEventListener('beforeunload', saveState);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(); });
+  </script>
+</body>
+</html>
